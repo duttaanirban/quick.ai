@@ -4,6 +4,12 @@ import Layout from "./pages/Layout.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Blogtitles from "./pages/Blogtitles.jsx"
 import Writearticles from "./pages/Writearticles.jsx"
+import GenImg from "./pages/GenImg.jsx"
+import Removebg from "./pages/Removebg.jsx"
+import Removeobj from "./pages/Removeobj.jsx"
+import Reviewresume from "./pages/Reviewresume.jsx"
+import Community from "./pages/Community.jsx"
+
 
 function App() {
   
@@ -14,9 +20,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/ai" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="blogtitles" element={<Blogtitles />} />
-          <Route path="writearticles" element={<Writearticles />} />
-
+          <Route path="blog-titles" element={<Blogtitles />} />
+          <Route path="write-article" element={<Writearticles />} />
+          <Route path="generate-images" element={<GenImg />} />
+          <Route path="remove-background" element={<Removebg />} />
+          <Route path="remove-object" element={<Removeobj />} />
+          <Route path="review-resume" element={<Reviewresume />} />
+          <Route path="community" element={<Community />} />
         </Route>
       </Routes>
     </>
