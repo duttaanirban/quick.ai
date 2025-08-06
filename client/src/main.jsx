@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
@@ -15,10 +14,10 @@ if (!PUBLISHABLE_KEY) {
 
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <StrictMode>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}></ClerkProvider>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <BrowserRouter>
       <App />
-    </StrictMode>
-  </BrowserRouter>
+    </BrowserRouter>
+  </ClerkProvider>
+  
 );
