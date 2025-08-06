@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { assets } from '../assets/assets';
 
 const Hero = () => {
     
@@ -24,6 +25,10 @@ const Hero = () => {
           text-black shadow-2xl transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0
             before:h-full before:w-0 before:bg-[#9F149F] before:transition-all before:duration-500 hover:text-white
             hover:before:left-0 hover:before:w-full"><span class="relative z-10">Watch demo</span></button>
+        </div>
+
+        <div className='flex items-center gap-4 mt-8 mx-auto text-gray-600'>
+            <img src={assets.user_group} alt="" className='h-8'/> Trusted by 10K+ people
         </div>
     </div>
   )
