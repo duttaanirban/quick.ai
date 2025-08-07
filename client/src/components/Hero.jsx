@@ -21,9 +21,9 @@ const Hero = () => {
         <div className='flex flex-wrap justify-center gap-4 text-sm max-sm:text-xs'>
             <button onClick={() => navigate('/ai')} className='bg-primary text-white px-10 py-3 rounded-lg
             hover:scale-102 active:scale-95 transition cursor-pointer'>Start creating now</button>
-            <button className=" rounded-lg hover:before:bg-red border-purple-500 relative h-[50px] w-40 overflow-hidden border bg-white px-3
-          text-black shadow-2xl transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0
-            before:h-full before:w-0 before:bg-[#9F149F] before:transition-all before:duration-500 hover:text-white
+            <button className=" rounded-lg hover:before:bg-red border-gray-500 relative h-[50px] w-40 overflow-hidden border bg-white px-3
+          text-black  transition-all before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0
+            before:h-full before:w-0 before:bg-[#e53360b3] before:transition-all before:duration-500 hover:text-white
             hover:before:left-0 hover:before:w-full"><span class="relative z-10">Watch demo</span></button>
         </div>
 
