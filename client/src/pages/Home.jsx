@@ -1,4 +1,5 @@
 import AiTools from "../components/AiTools.jsx";
+import Footer from "../components/Footer.jsx";
 import Hero from "../components/Hero.jsx";
 import Navbar from "../components/Navbar.jsx";
 import Plan from "../components/Plan.jsx";
@@ -13,6 +14,7 @@ const Home = () => {
     <AiTools />
     <Testimonial />
     <Plan />
+    <Footer />
     </>
   )
 }
