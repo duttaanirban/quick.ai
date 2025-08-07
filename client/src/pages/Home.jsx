@@ -1,3 +1,4 @@
+import AiTools from "../components/AiTools.jsx";
 import Hero from "../components/Hero.jsx";
 import Navbar from "../components/Navbar.jsx";
 
@@ -7,7 +8,7 @@ const Home = () => {
     <>
     <Navbar />
     <Hero />
-    
+    <AiTools />
     </>
   )
 }
