@@ -39,11 +39,21 @@ const GenImg = () => {
         <div className='mt-3 flex gap-3 flex-wrap sm:max-w-9/11'>
           {imageStyle.map((item, index) => (
           <span onClick={() => setSelectedStyle(item)} className={`text-xs px-4 py-1 border rounded-full
-          cursor-pointer ${selectedStyle === item ? 'bg-purple-50 text-purple-700' : ' text-gray-500 border-gray-300'}`} 
+          cursor-pointer ${selectedStyle === item ? 'bg-green-50 text-green-700' : ' text-gray-500 border-gray-300'}`} 
           key={index} >{item}</span>
           ))}
         </div>
-        <br/>
+
+        <div className='my-6 flex items-center gap-2'>
+          <label className='relative cursor-pointer'>
+            <input type='checkbox' onChange={(e) => setPublish(e.target.checked)} checked={publish} className='sr-only peer' />
+              <div className='w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-green-500 transition'></div>
+              <span className='absolute left-1 top-1 w-3 h-3 bg-white rounded-full peer-checked:translate-x-4'></span>
+          </label>
+          <p className='text-sm'>Make this image public</p>
+        </div>
+        
+
         <button className='w-full flex justify-center items-center gap-2
         bg-gradient-to-r from-[#00AD25] to-[#04FF50] text-white px-4 py-2 mt-6
         text-sm rounded-lg cursor-pointer'>
