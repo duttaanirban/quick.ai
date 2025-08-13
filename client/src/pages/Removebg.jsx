@@ -47,7 +47,7 @@ const Removebg = () => {
             </div>
           </div>
       </div>
-    </div> 
+    </div>
   )
 }
 
