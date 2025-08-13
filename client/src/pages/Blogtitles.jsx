@@ -13,8 +13,8 @@ const Blogtitles = () => {
     'Education'
   ]
 
-    const [selectedCategory, setSelectedCategory] = useState(blogCategories[0])
-    const [input, setInput] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState(blogCategories[0])
+  const [input, setInput] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
