@@ -17,6 +17,6 @@ export const auth = async (req, res, next) => {
         req.plan = hasPremiumPlan ? 'premium' : 'free';
         next();
     } catch (error) {
-        res.status(401).send('Unauthorized');
+        res.status(401).json({ error: 'Unauthorized' });
     }
 };
