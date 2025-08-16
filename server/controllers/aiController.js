@@ -27,7 +27,6 @@ export const generateArticle = async (req, res) => {
                     role: "user",
                     content: prompt,
                 },
-
             ],
             temperature: 0.7,
             max_tokens: length,
@@ -50,7 +49,22 @@ export const generateArticle = async (req, res) => {
         res.status(200).json({ content });
 
     } catch (error) {
-        res.status(500).json({ error: 'Failed to generate article' });
+        // Improved error handling
+        let message = 'Failed to generate article';
+        if (error.response) {
+            try {
+                const json = typeof error.response.data === 'string' ? JSON.parse(error.response.data) : error.response.data;
+                if (json && json.error) message = `API error: ${json.error}`;
+                else if (json && json.message) message = `API: ${json.message}`;
+            } catch (e) {
+                message = `API error: ${error.response.status} ${error.response.statusText}`;
+            }
+        } else if (error.request) {
+            message = 'No response from API';
+        } else if (error.message) {
+            message = error.message;
+        }
+        res.status(500).json({ error: message });
     }
 };
 
@@ -72,7 +86,6 @@ export const generateBlogTitle = async (req, res) => {
                     role: "user",
                     content: prompt,
                 },
-
             ],
             temperature: 0.7,
             max_tokens: 100,
@@ -95,7 +108,22 @@ export const generateBlogTitle = async (req, res) => {
         res.status(200).json({ content });
 
     } catch (error) {
-        res.status(500).json({ error: 'Failed to generate article' });
+        // Improved error handling
+        let message = 'Failed to generate blog title';
+        if (error.response) {
+            try {
+                const json = typeof error.response.data === 'string' ? JSON.parse(error.response.data) : error.response.data;
+                if (json && json.error) message = `API error: ${json.error}`;
+                else if (json && json.message) message = `API: ${json.message}`;
+            } catch (e) {
+                message = `API error: ${error.response.status} ${error.response.statusText}`;
+            }
+        } else if (error.request) {
+            message = 'No response from API';
+        } else if (error.message) {
+            message = error.message;
+        }
+        res.status(500).json({ error: message });
     }
 };
 
