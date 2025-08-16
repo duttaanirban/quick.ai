@@ -51,3 +51,78 @@ export const generateArticle = async (req, res) => {
         res.status(500).json({ error: 'Failed to generate article' });
     }
 };
+
+export const generateBlogTitle = async (req, res) => {
+    try {
+        const {userId} = req.auth();
+        const {prompt} = req.body;
+        const plan = req.plan;
+        const freeUsage = req.free_usage;
+
+        if (plan !== 'premium' && freeUsage >= 10) {
+            return res.status(403).json({ success: false, message: 'Insufficient free usage' });
+        }
+
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: [
+                {
+                    role: "user",
+                    content: prompt,
+                },
+
+            ],
+            temperature: 0.7,
+            max_tokens: 100,
+        });
+
+        const content = response.choices[0].message.content;
+
+        await sql`
+            INSERT INTO creations (user_id, prompt, content, type)
+            VALUES (${userId}, ${prompt}, ${content}, 'article')`;
+
+            if (plan !== 'premium') {
+                await clerkClient.users.updateUserMetadata(userId,{
+                    privateMetadata: {
+                        free_usage: freeUsage + 1
+                    }
+                });
+            }
+
+            res.status(200).json({ content });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate article' });
+    }
+};
+
+export const generateImage = async (req, res) => {
+    try {
+        const {userId} = req.auth();
+        const {prompt, publish} = req.body;
+        const plan = req.plan;
+
+        if (plan !== 'premium') {
+            return res.status(403).json({ success: false, message: 'This feature is only available for premium users' });
+        }
+
+        
+        await sql`
+            INSERT INTO creations (user_id, prompt, content, type)
+            VALUES (${userId}, ${prompt}, ${content}, 'article')`;
+
+            if (plan !== 'premium') {
+                await clerkClient.users.updateUserMetadata(userId,{
+                    privateMetadata: {
+                        free_usage: freeUsage + 1
+                    }
+                });
+            }
+
+            res.status(200).json({ content });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate article' });
+    }
+};

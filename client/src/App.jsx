@@ -9,11 +9,21 @@ import Removebg from "./pages/Removebg.jsx"
 import Removeobj from "./pages/Removeobj.jsx"
 import Reviewresume from "./pages/Reviewresume.jsx"
 import Community from "./pages/Community.jsx"
+import { useAuth } from "@clerk/clerk-react"
+import { useEffect } from "react"
 
 
-function App() {
+const App = () => {
+
+  const {getToken} = useAuth();
+
+  useEffect(() => {
+    getToken().then((token) => {
+      // Use the token to fetch data
+      console.log("Token fetched:", token);
+    });
+  }, []);
   
-
   return (
     <>
       <Routes>
