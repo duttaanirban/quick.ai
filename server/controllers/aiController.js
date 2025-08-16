@@ -1,13 +1,13 @@
 import OpenAI from "openai";
 import sql from "../config/db.js";
 import {v2 as cloudinary} from 'cloudinary';
-
+import axios from "axios";
+import FormData from "form-data"; // <-- Proper Node.js FormData
 
 const AI = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
 });
-
 
 export const generateArticle = async (req, res) => {
     try {
@@ -39,15 +39,15 @@ export const generateArticle = async (req, res) => {
             INSERT INTO creations (user_id, prompt, content, type)
             VALUES (${userId}, ${prompt}, ${content}, 'article')`;
 
-            if (plan !== 'premium') {
-                await clerkClient.users.updateUserMetadata(userId,{
-                    privateMetadata: {
-                        free_usage: freeUsage + 1
-                    }
-                });
-            }
+        if (plan !== 'premium') {
+            await clerkClient.users.updateUserMetadata(userId,{
+                privateMetadata: {
+                    free_usage: freeUsage + 1
+                }
+            });
+        }
 
-            res.status(200).json({ content });
+        res.status(200).json({ content });
 
     } catch (error) {
         res.status(500).json({ error: 'Failed to generate article' });
@@ -84,15 +84,15 @@ export const generateBlogTitle = async (req, res) => {
             INSERT INTO creations (user_id, prompt, content, type)
             VALUES (${userId}, ${prompt}, ${content}, 'blog-title')`;
 
-            if (plan !== 'premium') {
-                await clerkClient.users.updateUserMetadata(userId,{
-                    privateMetadata: {
-                        free_usage: freeUsage + 1
-                    }
-                });
-            }
+        if (plan !== 'premium') {
+            await clerkClient.users.updateUserMetadata(userId,{
+                privateMetadata: {
+                    free_usage: freeUsage + 1
+                }
+            });
+        }
 
-            res.status(200).json({ content });
+        res.status(200).json({ content });
 
     } catch (error) {
         res.status(500).json({ error: 'Failed to generate article' });
@@ -101,42 +101,55 @@ export const generateBlogTitle = async (req, res) => {
 
 export const generateImage = async (req, res) => {
     try {
-        const {userId} = req.auth();
-        const {prompt, publish} = req.body;
+        const { userId } = req.auth();
+        const { prompt, publish } = req.body;
         const plan = req.plan;
 
         if (plan !== 'premium') {
             return res.status(403).json({ success: false, message: 'This feature is only available for premium users' });
         }
 
-        const formData = new FormData()
-        formData.append('prompt', prompt)
+        // Use form-data package for Node.js compatibility
+        const formData = new FormData();
+        formData.append('prompt', prompt);
 
-        const {data} = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
-            headers: {'x-api-key': process.env.CLIPDROP_API_KEY },
+        const { data } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
+            headers: {
+                ...formData.getHeaders(),
+                'x-api-key': process.env.CLIPDROP_API_KEY
+            },
             responseType: 'arraybuffer'
-        })
+        });
 
-        const base64Image = `data:image/png;base64,${buffer.from(data, 'binary').
-            toString('base64')}`;
+        const base64Image = `data:image/png;base64,${Buffer.from(data, 'binary').toString('base64')}`;
 
-        const {secure_url} = await cloudinary.uploader.upload(base64Image);
+        const { secure_url } = await cloudinary.uploader.upload(base64Image);
 
         await sql`
             INSERT INTO creations (user_id, prompt, content, type, publish)
-            VALUES (${userId}, ${prompt}, ${content}, 'image', ${publish})`;
+            VALUES (${userId}, ${prompt}, ${secure_url}, 'image', ${publish ?? false})`;
 
-            if (plan !== 'premium') {
-                await clerkClient.users.updateUserMetadata(userId,{
-                    privateMetadata: {
-                        free_usage: freeUsage + 1
-                    }
-                });
-            }
-
-            res.status(200).json({ content });
-
+        res.status(200).json({ success: true, content: secure_url });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to generate article' });
+        console.error('Image generation error:', error);
+        // Try to extract a more helpful error message from Axios/ClipDrop
+        let message = 'Failed to generate image';
+        if (error.response) {
+            // API responded with an error status
+            try {
+                // Try to parse JSON error message from response
+                const json = JSON.parse(Buffer.from(error.response.data).toString('utf8'));
+                if (json && json.error) message = `ClipDrop API error: ${json.error}`;
+                else if (json && json.message) message = `ClipDrop API: ${json.message}`;
+            } catch (e) {
+                // Not JSON, fallback to status text
+                message = `ClipDrop API error: ${error.response.status} ${error.response.statusText}`;
+            }
+        } else if (error.request) {
+            message = 'No response from ClipDrop API';
+        } else if (error.message) {
+            message = error.message;
+        }
+        res.status(500).json({ error: message });
     }
 };
