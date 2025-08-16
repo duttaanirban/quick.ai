@@ -45,6 +45,8 @@ export const generateArticle = async (req, res) => {
                 });
             }
 
+            res.status(200).json({ content });
+
     } catch (error) {
         res.status(500).json({ error: 'Failed to generate article' });
     }
