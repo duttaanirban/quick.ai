@@ -41,12 +41,23 @@ export const toggleLikeCreation = async (req, res) => {
             return res.status(404).json({ error: 'Creation not found' });
         }
 
-        const isLiked = creation.likes.includes(userId);
+        const currentLikes = creation.likes;
+        const userIdStr = userId.toString();
+        let updatedLikes;
+        let message;
+
+        if (currentLikes && currentLikes.includes(userIdStr)) {
+            updatedLikes = currentLikes.filter((user)=>user !== userIdStr);
+            message = 'Creation unliked successfully';
+        } else {
+            updatedLikes = [...currentLikes, userIdStr];
+            message = 'Creation liked successfully';
+        }
+
+        const formattedArray = `{${updatedLikes.join(',')}}`;
 
         await sql`
-            UPDATE creations SET likes = ${isLiked ? sql`array_remove(likes, ${userId})` : sql`array_append(likes, ${userId})`}
-            WHERE id = ${creationId}
-        `;
+            UPDATE creations SET likes = ${formattedArray}::text[] WHERE id = ${id}`;
 
         res.status(200).json({ message: 'Like toggled successfully' });
     } catch (error) {
