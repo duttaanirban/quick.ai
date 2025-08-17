@@ -1,6 +1,6 @@
 import e from "express";
-import { auth } from "../middlewares/auth";
-import { getPublishedCreations, getUserCreations, toggleLikeCreation } from "../controllers/userController";
+import { auth } from "../middlewares/auth.js";
+import { getPublishedCreations, getUserCreations, toggleLikeCreation } from "../controllers/userController.js";
 
 const userRouter = e.Router();
 
