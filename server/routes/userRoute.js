@@ -1,0 +1,11 @@
+import e from "express";
+import { auth } from "../middlewares/auth";
+import { getPublishedCreations, getUserCreations, toggleLikeCreation } from "../controllers/userController";
+
+const userRouter = e.Router();
+
+userRouter.get('/get-user-creations', auth, getUserCreations);
+userRouter.get('/get-published-creations', auth, getPublishedCreations);
+userRouter.post('/toggle-like-creation', auth, toggleLikeCreation);
+
+export default userRouter;
