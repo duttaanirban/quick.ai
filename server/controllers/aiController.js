@@ -48,7 +48,7 @@ export const generateArticle = async (req, res) => {
             });
         }
 
-        res.status(200).json({ content });
+    res.status(200).json({ success: true, content });
 
     } catch (error) {
         // Improved error handling
@@ -107,7 +107,7 @@ export const generateBlogTitle = async (req, res) => {
             });
         }
 
-        res.status(200).json({ content });
+    res.status(200).json({ success: true, content });
 
     } catch (error) {
         // Improved error handling
