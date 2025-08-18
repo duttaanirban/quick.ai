@@ -3,6 +3,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAuth } from '@clerk/clerk-react'
 import toast from 'react-hot-toast'
+import Markdown from 'react-markdown'
 
 const Writearticles = () => {
 
@@ -96,7 +97,9 @@ const Writearticles = () => {
           </div>
           ) : (
             <div className='mt-3 h-full overflow-y-scroll text-sm text-slate-600'>
-              <div>{content}</div>
+            <div className='reset-tw'>
+              <Markdown>{content}</Markdown>
+            </div>
             </div>
           )}
           

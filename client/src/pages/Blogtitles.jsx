@@ -3,6 +3,8 @@ import { useState } from "react"
 
 const Blogtitles = () => {
 
+  axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+
   const blogCategories = [
     'General',
     'Technology',
