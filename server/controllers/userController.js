@@ -38,7 +38,7 @@ export const toggleLikeCreation = async (req, res) => {
         `;
 
         if (!creation) {
-            return res.status(404).json({ error: 'Creation not found' });
+            return res.status(404).json({ success: false, error: 'Creation not found' });
         }
 
         const currentLikes = creation.likes;
@@ -59,9 +59,9 @@ export const toggleLikeCreation = async (req, res) => {
         await sql`
             UPDATE creations SET likes = ${formattedArray}::text[] WHERE id = ${id}`;
 
-        res.status(200).json({ message: 'Like toggled successfully' });
+        res.status(200).json({ success: true, message });
     } catch (error) {
         console.error('Error toggling like:', error);
-        res.status(500).json({ error: 'Failed to toggle like' });
+        res.status(500).json({ success: false, error: 'Failed to toggle like' });
     }
 };
