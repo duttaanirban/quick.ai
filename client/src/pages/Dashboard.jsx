@@ -3,13 +3,35 @@ import { dummyCreationData } from "../assets/assets";
 import { GemIcon, Sparkles } from "lucide-react";
 import { Protect } from "@clerk/clerk-react";
 import CreationItem from "../components/CreationItem";
-
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 const Dashboard = () => {
 
+  axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+
   const [creation, setCreation] = useState([]);
-  
+  const [loading, setLoading] = useState(true);
+  const {getToken} = useAuth();
+
   const getdashboardData = async ()=> {
-    setCreation(dummyCreationData)
+    try {
+      const token = await getToken();
+      const { data } = await axios.get('/api/user/get-user-creations', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      // The backend does NOT return a 'success' property for this endpoint
+      if (data.creations) {
+        setCreation(data.creations || []);
+      } else {
+        toast.error(data.message || 'Failed to fetch creations');
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error.message || 'Failed to fetch creations');
+    }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -47,7 +69,14 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="space-y-3">
+      {
+        loading ? (
+          <div className="flex justify-center items-center h-3/4">
+            <div className="animate-spin rounded-full h-11 w-11 border-3
+            border-purple-500 border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
         <p className="mt-6 mb-4">Recent Creations</p>
         {
           creation.map((item)=>
@@ -55,6 +84,8 @@ const Dashboard = () => {
           )
         }
       </div>
+        )
+      }
     </div>
   )
 }
