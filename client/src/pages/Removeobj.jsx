@@ -1,13 +1,49 @@
 import { Scissors, Sparkles } from 'lucide-react'
 import { useState } from 'react'
+import axios from 'axios'
+import { useAuth } from '@clerk/clerk-react';
+import toast from 'react-hot-toast';
 
 const Removeobj = () => {
 
+  axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+
   const [input, setInput] = useState('')
   const [object, setObject] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [content, setContent] = useState('')
+
+  const { getToken } = useAuth();
+
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    try {
+      setLoading(true);
+
+      if (object.split(' ').length > 1) {
+        return toast.error('Please specify a single object to remove');
+      }
+
+      const formData = new FormData();
+      formData.append('image', input);
+      formData.append('object', object);
+
+      const { data } = await axios.post('/api/ai/remove-image-object', formData, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`
+        }
+      });
+      if (data.success) {
+        setContent(data.content);
+      } else {
+        toast.error(data.message || 'Object removal failed');
+      }
+    } catch (error) {
+      console.error('Error removing object:', error);
+      toast.error(error?.response?.data?.error || error.message || 'Object removal failed');
+    }
+    setLoading(false);
   }
 
   return (
@@ -30,10 +66,13 @@ const Removeobj = () => {
         <textarea onChange={(e) => setObject(e.target.value)} value={object} rows={4} className='w-full p-2 px-3 mt-2 outline-none text-sm rounded-md
         border border-gray-300' placeholder='e.g. a cat' required/>
 
-        <button className='w-full flex justify-center items-center gap-2
+        <button disabled={loading} className='w-full flex justify-center items-center gap-2
         bg-gradient-to-r from-[#417DF6] to-[#8E37EB] text-white px-4 py-2 mt-6
         text-sm rounded-lg cursor-pointer'>
-          <Scissors className='w-5'/>
+          {
+            loading ? <span className='w-4 h-4 my-1 rounded-full border-2
+            border-t-transparent animate-spin'></span> : <Scissors className='w-5'/>
+          }
           Remove Object
         </button>
       
@@ -46,12 +85,19 @@ const Removeobj = () => {
             <Scissors className='w-5 h-5 text-[#4A7AFF]'/>
             <h1 className='text-xl font-semibold'>Processed Object</h1>
           </div>
-          <div className='flex-1 flex justify-center items-center'>
-            <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
-              <Scissors className='w-9 h-9' />
-              <p>Upload an image and click "Remove Object" to get started</p>
-            </div>
-          </div>
+          {
+            !content ? (
+              <div className='flex-1 flex justify-center items-center'>
+                <div className='text-sm flex flex-col items-center gap-5 text-gray-400'>
+                  <Scissors className='w-9 h-9' />
+                  <p>Upload an image and click "Remove Object" to get started</p>
+                </div>
+              </div>
+            ) : (
+              <img src={content} alt="Processed" className='mt-3 w-full h-full'/>
+            )
+          }
+          
       </div>
     </div>
   )
