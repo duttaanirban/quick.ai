@@ -34,6 +34,41 @@ const Community = () => {
     setLoading(false)
   }
 
+  const imageLikeToggle = async (id) => {
+    // Optimistically update UI
+    setCreations((prev) => prev.map((creation) => {
+      if (creation.id !== id) return creation;
+      const userIdStr = user.id.toString();
+      let newLikes;
+      if (creation.likes.includes(userIdStr)) {
+        newLikes = creation.likes.filter((uid) => uid !== userIdStr);
+      } else {
+        newLikes = [...creation.likes, userIdStr];
+      }
+      return { ...creation, likes: newLikes };
+    }));
+    // Show loading toast immediately
+    const toastId = toast.loading('Updating like...');
+    try {
+      const {data} = await axios.post('/api/user/toggle-like-creation', {id}, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`
+        }
+      })
+      if (data.success) {
+        toast.success(data.message || 'Like toggled successfully', { id: toastId });
+      } else {
+        toast.error(data.error || 'Failed to toggle like', { id: toastId });
+        // Revert optimistic update on error
+        await fetchCreations();
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error.message || 'Failed to toggle like', { id: toastId });
+      // Revert optimistic update on error
+      await fetchCreations();
+    }
+  }
+
   useEffect(() => {
     if (user) {
       fetchCreations()
@@ -56,7 +91,7 @@ const Community = () => {
                 <p className='text-sm hidden group-hover:block'>{creation.prompt}</p>
                 <div className='flex gap-1 items-center'>
                   <p>{creation.likes.length}</p>
-                  <Heart className={`min-w-5 h-5 hover:scale-110 cursor-pointer ${creation.likes.includes(user.id) ? 'fill-red-500 text-red-600' : 'text-white'}`}/>
+                  <Heart onClick={() => imageLikeToggle(creation.id)} className={`min-w-5 h-5 hover:scale-110 cursor-pointer ${creation.likes.includes(user.id) ? 'fill-red-500 text-red-600' : 'text-white'}`}/>
                 </div>
               </div>
             </div>
