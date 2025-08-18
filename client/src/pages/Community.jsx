@@ -1,15 +1,37 @@
 import { useEffect, useState } from 'react'
-import {useUser} from '@clerk/clerk-react'
+import {useUser, useAuth} from '@clerk/clerk-react'
 import { dummyPublishedCreationData } from '../assets/assets'
 import { Heart } from 'lucide-react'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const Community = () => {
 
+
+  axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
   const [creations, setCreations] = useState([])
   const {user} = useUser()
+  const [loading, setLoading] = useState(true)
+
+  const {getToken} = useAuth()
 
   const fetchCreations = async () => {
-    setCreations(dummyPublishedCreationData)
+    try {
+      const token = await getToken()
+      const { data } = await axios.get('/api/user/get-published-creations', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if (data.success) {
+        setCreations(data.creations || dummyPublishedCreationData)
+      } else {
+        toast.error(data.message || 'Failed to fetch creations')
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.error || error.message || 'Failed to fetch creations')
+    }
+    setLoading(false)
   }
 
   useEffect(() => {

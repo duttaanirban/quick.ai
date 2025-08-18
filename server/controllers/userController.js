@@ -21,10 +21,10 @@ export const getPublishedCreations = async (req, res) => {
             SELECT * FROM creations WHERE publish = true
         ORDER BY created_at DESC`;
 
-        res.status(200).json({ creations });
+        res.status(200).json({ success: true, creations });
     } catch (error) {
         console.error('Error fetching user creations:', error);
-        res.status(500).json({ error: 'Failed to fetch user creations' });
+        res.status(500).json({ success: false, error: 'Failed to fetch user creations' });
     }
 };
 
